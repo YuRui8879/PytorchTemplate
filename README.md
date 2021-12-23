@@ -4,23 +4,23 @@
 
 #### 目录
 
--root
-|-Algorithm
-| |-EarlyStopping   提前停止类，当结果无提高时提前结束训练
-| |-Regularization  正则化类，用于向权重及偏置添加L1或L2正则化项
-| |-Tester          测试器，测试训练好的模型
-| |-Trainer         训练器，训练模型
-|-DataLoader
-| |-OfflineLoader   离线数据读取器，将所有数据加载至内存后开始训练
-| |-OnlineLoader    在线数据读取器，加载部分数据至内存后开始训练，实现边加载边训练
-|-Metrics
-| |-Metrics         评价指标类，向该类添加评价指标，训练时会自动测试模型性能
-| |-Classification  分类指标，已实现的部分分类指标
-| |-Regression      回归指标，已实现的部分回归指标
-|-Model
-| |-Block           一些用于加强模型的模块，例如注意力模块
-| |-VGG             已实现的VGG模型
-main                程序入口，目前还是面向过程的写法，以后会进行封装
+-root  
+|-Algorithm  
+| |-EarlyStopping   提前停止类，当结果无提高时提前结束训练  
+| |-Regularization  正则化类，用于向权重及偏置添加L1或L2正则化项  
+| |-Tester          测试器，测试训练好的模型  
+| |-Trainer         训练器，训练模型  
+|-DataLoader   
+| |-OfflineLoader   离线数据读取器，将所有数据加载至内存后开始训练   
+| |-OnlineLoader    在线数据读取器，加载部分数据至内存后开始训练，实现边加载边训练  
+|-Metrics  
+| |-Metrics         评价指标类，向该类添加评价指标，训练时会自动测试模型性能  
+| |-Classification  分类指标，已实现的部分分类指标  
+| |-Regression      回归指标，已实现的部分回归指标  
+|-Model  
+| |-Block           一些用于加强模型的模块，例如注意力模块  
+| |-VGG             已实现的VGG模型  
+main                程序入口，目前还是面向过程的写法，以后会进行封装  
 
 #### 如何使用该模板
 
@@ -28,6 +28,6 @@ main                程序入口，目前还是面向过程的写法，以后会
 
 #### 目前已实现的模型
 
-· VGG家族
+* VGG家族
 
 
