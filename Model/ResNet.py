@@ -23,8 +23,10 @@ class ResBlock(nn.Module):
         self.conv2 = CNNBlock(out_ch,out_ch,kernel_size = 3,stride = stride,padding = 1,is_trans=False)
         if stride == 2:
             self.convt = CNNBlock(in_ch,out_ch,kernel_size = 1,stride = 2,is_trans=False)
-        else:
+        elif in_ch != out_ch:
             self.convt = CNNBlock(in_ch,out_ch,kernel_size = 1,stride = 1,is_trans=False)
+        else:
+            self.convt = None
         self.relu = nn.ReLU(True)
 
     def forward(self,x):
@@ -233,7 +235,7 @@ class ResNet152(nn.Module):
 
 
 if __name__ == '__main__':
-    model = ResNet34()
+    model = ResNet18()
     x = torch.rand(2,112,112)
     y = model(x)
     print(y.shape)

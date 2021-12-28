@@ -28,7 +28,8 @@ main                程序入口，目前还是面向过程的写法，以后会
 
 #### 目前已实现的模型
 
-* VGG家族
-* ResNet家族
+* VGG
+* ResNet
+* SENet
 
 
