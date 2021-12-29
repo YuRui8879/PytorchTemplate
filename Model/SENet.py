@@ -71,8 +71,73 @@ class SENet(nn.Module):
         x = self.softmax(self.fc(x))
         return x
 
+class ResNeXtBlock(nn.Module):
+    def __init__(self,in_ch,cardinality,group,stride) -> None:
+        super(ResNeXtBlock,self).__init__()
+        self.group = cardinality * group
+        self.conv1 = nn.Conv2d(in_ch,self.group,1,1,0,bias=False)
+        self.conv2 = nn.Conv2d(self.group,self.group,3,stride,1,groups=cardinality,bias=False)
+        self.conv3 = nn.Conv2d(self.group,self.group * 2,1,1,0,bias=False)
+        self.bn1 = nn.BatchNorm2d(self.group)
+        self.bn2 = nn.BatchNorm2d(self.group)
+        self.bn3 = nn.BatchNorm2d(self.group * 2)
+        self.se = SE(self.group * 2,16)
+        self.sidepath = nn.Sequential(
+            nn.Conv2d(in_ch,self.group * 2,1,stride,0,bias=False),
+            nn.BatchNorm2d(self.group * 2)
+        )
+        self.relu = nn.ReLU(True)
+
+    def forward(self,x):
+        shortcut = x
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.relu(self.bn2(self.conv2(x)))
+        x = self.bn3(self.conv3(x))
+        coef = self.se(x)
+        x = x * coef
+        x += self.sidepath(shortcut)
+        x = self.relu(x)
+        return x
+
+class SENeXt(nn.Module):
+    def __init__(self,cardinality = 32,group = 4,num_classes = 1000) -> None:
+        super(SENeXt,self).__init__()
+        self.cardinality = cardinality
+        self.channels = 64
+        self.conv1 = nn.Conv2d(1,self.channels,7,2,3,bias=False)
+        self.bn1 = nn.BatchNorm2d(self.channels)
+        self.relu = nn.ReLU(True)
+        self.maxpool = nn.MaxPool2d(3,2,1)
+        self.conv2 = self._make_layers(group * 2,3,1)
+        self.conv3 = self._make_layers(group * 4,4,2)
+        self.conv4 = self._make_layers(group * 8,6,2)
+        self.conv5 = self._make_layers(group * 16,3,2)
+        self.avgpool = nn.AdaptiveAvgPool2d(1)
+        self.softmax = nn.Softmax(-1)
+        self.fc = nn.Linear(self.channels,num_classes)
+
+    def _make_layers(self,d,blocks,stride):
+        strides = [stride] + [1] * (blocks - 1)
+        layers = []
+        for s in strides:
+            layers.append(ResNeXtBlock(self.channels,self.cardinality,d,s))
+            self.channels = self.cardinality*d*2
+        return nn.Sequential(*layers)
+
+    def forward(self,x):
+        x = x.unsqueeze(1)
+        x = self.relu(self.bn1(self.conv1(x)))
+        x = self.maxpool(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
+        x = self.conv4(x)
+        x = self.conv5(x)
+        x = self.avgpool(x).view(x.size(0),-1)
+        x = self.softmax(self.fc(x))
+        return x
+
 if __name__ == '__main__':
-    model = SENet(1000)
+    model = SENeXt()
     x = torch.rand(2,224,224)
     y = model(x)
     print(y.size())
